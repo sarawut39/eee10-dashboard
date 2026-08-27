@@ -41,9 +41,25 @@ export default function App() {
       />
 
       <style>{`
-        @keyframes spin    { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
-        @keyframes pulse   { 0%,100%{opacity:1} 50%{opacity:.4} }
-        @keyframes fadeIn  { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes spin   { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+        @keyframes pulse  { 0%,100%{opacity:1} 50%{opacity:.4} }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes glow   { 0%,100%{box-shadow:0 0 8px #00d2ff44} 50%{box-shadow:0 0 20px #00d2ffaa} }
+
+        @media (max-width: 768px) {
+          .main-grid {
+            grid-template-columns: 1fr !important;
+          }
+          main {
+            padding: 12px 10px !important;
+          }
+        }
+
+        @media (min-width: 769px) and (max-width: 1100px) {
+          .main-grid {
+            grid-template-columns: 1fr 1fr !important;
+          }
+        }
       `}</style>
 
       <main style={{ maxWidth:1280, margin:'0 auto', padding:'20px 16px' }}>
@@ -56,13 +72,16 @@ export default function App() {
           mqttError={mqttError}
         />
 
-        {/* ── ROW 1: 3 คอลัมน์ ── */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr 1fr',
-          gap: 14,
-          marginBottom: 14,
-        }}>
+        {/* ── ROW 1: Responsive Grid ── */}
+        <div
+          className="main-grid"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr 1fr',
+            gap: 14,
+            marginBottom: 14,
+          }}
+        >
 
           {/* ── Realtime Sensors ── */}
           <SectionCard title="Realtime — Sensors" accent="#00d2ff">
@@ -75,18 +94,18 @@ export default function App() {
               <div style={{ display:'flex', justifyContent:'space-around', width:'100%' }}>
                 <GaugeChart
                   label="Wind Speed" unit="m/s"
-                  value={d.wind ?? 0} min={0} max={6000}
+                  value={d.wind ?? 0} min={0} max={25}
                   color="#00d2ff" size={145} offline={offline}
                 />
                 <GaugeChart
                   label="RPM" unit="rpm"
-                  value={d.rpm ?? 0} min={0} max={6000}
+                  value={d.rpm ?? 0} min={0} max={3000}
                   color="#a78bfa" size={145} offline={offline}
                 />
               </div>
               <GaugeChart
                 label="Current (AC)" unit="A"
-                value={d.ac_a ?? 0} min={0} max={100}
+                value={d.ac_a ?? 0} min={0} max={50}
                 color="#f97316" size={145} offline={offline}
               />
             </div>
@@ -100,11 +119,14 @@ export default function App() {
               alignItems: 'center',
               justifyContent: 'center',
               height: '100%',
+              paddingTop: 16,
+              paddingBottom: 16,
             }}>
               <GaugeChart
                 label="DC Voltage (Input)" unit="V"
                 value={d.dc_v ?? 0} min={0} max={25}
-                color="#22c55e" size={190} offline={offline}
+                color="#22c55e" size={190}
+                offline={offline}
                 decimals={2}
               />
             </div>
@@ -114,66 +136,25 @@ export default function App() {
           <SectionCard title="Power — Output" accent="#f97316">
             <div style={{
               display: 'flex',
-              flexDirection: 'column',
+              flexDirection: 'row',
               alignItems: 'center',
-              justifyContent: 'center',
-              height: '100%',
-              gap: 16,
+              justifyContent: 'space-evenly',
+              flexWrap: 'nowrap',
+              width: '100%',
+              paddingTop: 16,
+              paddingBottom: 16,
+              gap: 8,
             }}>
-
-              {/* PF + VAC Gauge แถวบน */}
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-around',
-                alignItems: 'center',
-                width: '100%',
-              }}>
-                {/* DonutGauge size=130 → ดูใหญ่เพราะเป็น full circle */}
-                <DonutGauge
-                  label="Power Factor" unit="PF"
-                  value={d.ac_pf ?? 0} max={1}
-                  color="#ef4444" size={130} offline={offline}
-                />
-                {/* GaugeChart size=160 → ให้ดูสูงเท่ากับ DonutGauge */}
-                <GaugeChart
-                  label="AC Voltage" unit="V"
-                  value={d.ac_v ?? 0} min={0} max={260}
-                  color="#00d2ff" size={160} offline={offline}
-                />
-              </div>
-
-              {/*
-              ── ค่าตัวเลขแถวล่าง (ปิดไว้ ถ้าอยากเปิดลบ {/* และ *\/ ออก) ──
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-around',
-                width: '100%',
-              }}>
-                {[
-                  ['Power Factor', (d.ac_pf ?? 0).toFixed(2), '',    '#ef4444'],
-                  ['AC Voltage',   (d.ac_v  ?? 0).toFixed(1), 'V',   '#00d2ff'],
-                  ['AC Current',   (d.ac_a  ?? 0).toFixed(2), 'A',   '#f97316'],
-                  ['AC Power',     (d.ac_w  ?? 0).toFixed(1), 'W',   '#22c55e'],
-                  ['Frequency',    (d.ac_hz ?? 0).toFixed(1), 'Hz',  '#a78bfa'],
-                ].map(([lbl, val, unit, clr]) => (
-                  <div key={lbl} style={{ textAlign:'center' }}>
-                    <div style={{
-                      fontSize: '.65rem',
-                      color: 'rgba(255,255,255,.35)',
-                      marginBottom: 3,
-                    }}>{lbl}</div>
-                    <div style={{
-                      fontSize: '.9rem',
-                      fontWeight: 700,
-                      color: offline ? 'rgba(255,255,255,.2)' : clr,
-                    }}>
-                      {offline ? '—' : `${val}${unit}`}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              */}
-
+              <DonutGauge
+                label="Power Factor" unit="PF"
+                value={d.ac_pf ?? 0} max={1}
+                color="#ef4444" size={130} offline={offline}
+              />
+              <GaugeChart
+                label="AC Voltage" unit="V"
+                value={d.ac_v ?? 0} min={0} max={260}
+                color="#00d2ff" size={160} offline={offline}
+              />
             </div>
           </SectionCard>
 
