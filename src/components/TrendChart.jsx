@@ -11,6 +11,9 @@ const LINES = [
   { key:'dc_v',      name:'Voltage DC (V)',   color:'#22c55e', axis:'right' },
   { key:'ac_pf',     name:'Power Factor (%)', color:'#fbbf24', axis:'right' },
   { key:'ac_v',      name:'AC Voltage (V)',   color:'#e879f9', axis:'right' },
+  { key:'pzem3p_va', name:'Phase A (V)',      color:'#f59e0b', axis:'right' },
+  { key:'pzem3p_vb', name:'Phase B (V)',      color:'#eab308', axis:'right' },
+  { key:'pzem3p_vc', name:'Phase C (V)',      color:'#facc15', axis:'right' },
 ]
 
 function CustomTooltip({ active, payload, label }) {
@@ -89,8 +92,8 @@ export default function TrendChart({ data, title = 'All Signals' }) {
             <YAxis
               yAxisId="right"
               orientation="right"
-              domain={[0, 260]}
-              ticks={[0, 20, 40, 60, 80, 100, 140, 180, 220, 260]}
+              domain={[0, 300]}
+              ticks={[0, 40, 80, 120, 160, 200, 240, 280, 300]}
               allowDataOverflow
               // width={55}
               tick={{ fill:'rgba(255,255,255,.25)', fontSize:10 }}

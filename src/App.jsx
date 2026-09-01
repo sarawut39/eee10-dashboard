@@ -10,6 +10,7 @@ import GaugeChart      from './components/GaugeChart'
 import DonutGauge      from './components/DonutGauge'
 import TrendChart      from './components/TrendChart'
 import DatePickerPanel from './components/DatePickerPanel'
+import EnergyStat from './components/EnergyStat'
 
 export default function App() {
   const { mqttConnected, deviceOnline, sensorData,
@@ -77,7 +78,7 @@ export default function App() {
           className="main-grid"
           style={{
             display: 'grid',
-            gridTemplateColumns: '1fr 1fr 1fr',
+            gridTemplateColumns: '1fr 1fr 1fr 1fr',
             gap: 14,
             marginBottom: 14,
           }}
@@ -128,6 +129,39 @@ export default function App() {
                 color="#22c55e" size={190}
                 offline={offline}
                 decimals={2}
+              />
+            </div>
+          </SectionCard>
+
+          {/* ── Power Input (3-Phase, Pre-Battery) ── */}
+          <SectionCard title="Power — Input (3-Phase)" accent="#fbbf24">
+            <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:8 }}>
+              <div style={{ display:'flex', justifyContent:'space-around', width:'100%' }}>
+                <GaugeChart
+                  label="Phase A" unit="V"
+                  value={d.pzem3p_va ?? 0} min={0} max={300}
+                  color="#fbbf24" size={100} offline={offline}
+                />
+                <GaugeChart
+                  label="Phase B" unit="V"
+                  value={d.pzem3p_vb ?? 0} min={0} max={300}
+                  color="#fbbf24" size={100} offline={offline}
+                />
+                <GaugeChart
+                  label="Phase C" unit="V"
+                  value={d.pzem3p_vc ?? 0} min={0} max={300}
+                  color="#fbbf24" size={100} offline={offline}
+                />
+              </div>
+
+              <div style={{ width:'100%', borderTop:'1px solid rgba(255,255,255,.07)', margin:'2px 0 0' }} />
+
+              <EnergyStat
+                value={d.pzem3p_totalEnergy ?? 0}
+                unit="kWh"
+                label="พลังงานสะสม (รวม 3 เฟส)"
+                color="#fbbf24"
+                offline={offline}
               />
             </div>
           </SectionCard>
